@@ -1,5 +1,5 @@
 
-const books = [
+const bookmarks = [
   {
     'id': '8sdfbvbs65sd',
     'title': 'Google',
@@ -15,3 +15,5 @@ const books = [
     'rating': 5
   }
 ];
+
+module.exports = bookmarks;

@@ -33,6 +33,11 @@ app.use(function validateBearerToken(req, res, next) {
   next();
 });
 
+//get all bookmarks
+app.get('/bookmarks', (req, res) =>{
+  const bookmark = req.query;
+  res.send(bookmark);
+});
 
 if (NODE_ENV !== 'production') {
   logger.add(new winston.transports.Console({

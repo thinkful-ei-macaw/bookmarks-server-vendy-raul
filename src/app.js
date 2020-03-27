@@ -6,8 +6,11 @@ const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
 const winston = require('winston');
 const store = require('./store');
-
+const bodyParser = express.json();
+const { check, validationResult } = require('express-validator');
 const app = express();
+const uuid = require('uuid/v4');
+
 
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
@@ -33,6 +36,7 @@ app.use(function validateBearerToken(req, res, next) {
   // move to the next middleware
   next();
 });
+app.use(bodyParser);
 
 //get all bookmarks
 app.get('/bookmarks', (req, res) => {
@@ -52,6 +56,63 @@ app.get('/bookmarks/:id', (req, res) => {
   }
   res.json(bookmark);
 });
+
+app.post('/bookmarks',(req, res)=>{
+  const id = uuid();
+  
+  const { title, url, desc, rating} = req.body;
+  const newBookmark = {
+    id,
+    title,
+    url,
+    desc,
+    rating
+  };
+  if(!title){
+    return res
+      .status(400)
+      .send('Title required!');
+  }
+  if (!url) {
+    return res
+      .status(400)
+      .send('Url required!');
+  }
+  if (!desc) {
+    return res
+      .status(400)
+      .send('Description required!');
+  }
+  if (!rating) {
+    return res
+      .status(400)
+      .send('rating required!');
+  }
+  if(title < 1){
+    return res
+      .status(400)
+      .send('Please provide title longer than 1 letter');
+  }
+  if(desc < 1 || desc > 200) {
+    return res 
+      .status(400)
+      .send('Please input a proper description, between 1 and 200 characters.');
+  }
+  // if (url) {
+  //   return res
+  //     .status(400)
+  //     .send('Please provide correct Url Format.');
+  // }
+  if(rating !== Number(rating) || rating > 5 || rating < 1){
+    return res
+      .status(400)
+      .send('Please provide number between 1-5.');
+  }
+
+  store.bookmarks.push(newBookmark);
+  res.send('Book created');
+});
+ 
 
 if (NODE_ENV !== 'production') {
   logger.add(new winston.transports.Console({

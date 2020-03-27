@@ -5,7 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
 const winston = require('winston');
-const { bookmarks } = require('./store');
+const store = require('./store');
 
 const app = express();
 
@@ -36,13 +36,13 @@ app.use(function validateBearerToken(req, res, next) {
 
 //get all bookmarks
 app.get('/bookmarks', (req, res) => {
-  const bookmark = req.query;
-  res.send(bookmark);
+  res
+    .json(store.bookmarks);
 });
 
 app.get('/bookmarks/:id', (req, res) => {
   const { id } = req.params;
-  const bookmark = bookmarks.find(c => c.id == id);
+  const bookmark = store.bookmarks.find(c => c.id === id);
   // make sure book is found
   if (!bookmark) {
     logger.error(`Book with id ${id} not found.`);
@@ -63,9 +63,6 @@ app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
 
 app.use(function errorHandler(error, req, res, next) {
   let response;

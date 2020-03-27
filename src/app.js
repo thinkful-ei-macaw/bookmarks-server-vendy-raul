@@ -7,7 +7,6 @@ const { NODE_ENV } = require('./config');
 const winston = require('winston');
 const store = require('./store');
 const bodyParser = express.json();
-const { check, validationResult } = require('express-validator');
 const app = express();
 const uuid = require('uuid/v4');
 
@@ -24,6 +23,11 @@ const logger = winston.createLogger({
     new winston.transports.File({ filename: 'info.log' })
   ]
 });
+
+app.use(morgan(morganOption));
+app.use(helmet());
+app.use(cors());
+
 // api key configure
 app.use(function validateBearerToken(req, res, next) {
   const apiToken = process.env.API_TOKEN;
@@ -104,11 +108,11 @@ app.post('/bookmarks', (req, res) => {
       .status(400)
       .send('Please input a proper description, between 1 and 200 characters.');
   }
-  // if (url) {
-  //   return res
-  //     .status(400)
-  //     .send('Please provide correct Url Format.');
-  // }
+  if (!url.includes('http')) {
+    return res
+      .status(400)
+      .send('Please provide correct Url Format.');
+  }
   if (rating !== Number(rating) || rating > 5 || rating < 1) {
     logger.error('Proper rating format is required');
     return res
@@ -140,10 +144,6 @@ if (NODE_ENV !== 'production') {
     format: winston.format.simple()
   }));
 }
-
-app.use(morgan(morganOption));
-app.use(helmet());
-app.use(cors());
 
 
 app.use(function errorHandler(error, req, res, next) {

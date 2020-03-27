@@ -57,10 +57,10 @@ app.get('/bookmarks/:id', (req, res) => {
   res.json(bookmark);
 });
 
-app.post('/bookmarks',(req, res)=>{
+app.post('/bookmarks', (req, res) => {
   const id = uuid();
-  
-  const { title, url, desc, rating} = req.body;
+
+  const { title, url, desc, rating } = req.body;
   const newBookmark = {
     id,
     title,
@@ -68,7 +68,7 @@ app.post('/bookmarks',(req, res)=>{
     desc,
     rating
   };
-  if(!title){
+  if (!title) {
     logger.error('Title is required');
     return res
       .status(400)
@@ -92,15 +92,15 @@ app.post('/bookmarks',(req, res)=>{
       .status(400)
       .send('rating required!');
   }
-  if(title < 1){
+  if (title < 1) {
     logger.error('Title length is required');
     return res
       .status(400)
       .send('Please provide title longer than 1 letter');
   }
-  if(desc < 1 || desc > 200) {
+  if (desc < 1 || desc > 200) {
     logger.error('Desc length is required');
-    return res 
+    return res
       .status(400)
       .send('Please input a proper description, between 1 and 200 characters.');
   }
@@ -109,7 +109,7 @@ app.post('/bookmarks',(req, res)=>{
   //     .status(400)
   //     .send('Please provide correct Url Format.');
   // }
-  if(rating !== Number(rating) || rating > 5 || rating < 1){
+  if (rating !== Number(rating) || rating > 5 || rating < 1) {
     logger.error('Proper rating format is required');
     return res
       .status(400)
@@ -119,7 +119,21 @@ app.post('/bookmarks',(req, res)=>{
   store.bookmarks.push(newBookmark);
   res.send('Book created');
 });
- 
+
+app.delete('/bookmarks/:id', (req, res) => {
+  const { id } = req.params;
+  const bookmarkIndex = store.bookmarks.findIndex(b => b.id === id);
+
+  if (bookmarkIndex === -1) {
+    logger.error(`Bookmark with id ${id} not found`);
+    return res
+      .status(404)
+      .send('Not found');
+  }
+  store.bookmarks.splice(bookmarkIndex, 1);
+  res.json('deleted');
+});
+
 
 if (NODE_ENV !== 'production') {
   logger.add(new winston.transports.Console({

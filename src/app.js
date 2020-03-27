@@ -69,31 +69,37 @@ app.post('/bookmarks',(req, res)=>{
     rating
   };
   if(!title){
+    logger.error('Title is required');
     return res
       .status(400)
       .send('Title required!');
   }
   if (!url) {
+    logger.error('URL is required');
     return res
       .status(400)
       .send('Url required!');
   }
   if (!desc) {
+    logger.error('Desc is required');
     return res
       .status(400)
       .send('Description required!');
   }
   if (!rating) {
+    logger.error('rating is required');
     return res
       .status(400)
       .send('rating required!');
   }
   if(title < 1){
+    logger.error('Title length is required');
     return res
       .status(400)
       .send('Please provide title longer than 1 letter');
   }
   if(desc < 1 || desc > 200) {
+    logger.error('Desc length is required');
     return res 
       .status(400)
       .send('Please input a proper description, between 1 and 200 characters.');
@@ -104,6 +110,7 @@ app.post('/bookmarks',(req, res)=>{
   //     .send('Please provide correct Url Format.');
   // }
   if(rating !== Number(rating) || rating > 5 || rating < 1){
+    logger.error('Proper rating format is required');
     return res
       .status(400)
       .send('Please provide number between 1-5.');

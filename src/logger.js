@@ -15,4 +15,4 @@ if (NODE_ENV !== 'production') {
   }));
 }
 
-module.export = logger;
+module.exports = logger;

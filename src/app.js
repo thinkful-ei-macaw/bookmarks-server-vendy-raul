@@ -10,7 +10,7 @@ const bodyParser = express.json();
 const app = express();
 const uuid = require('uuid/v4');
 const validateBearerToken = require('./validate-bearer-token');
-
+const logger = require('./logger');
 
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
@@ -26,6 +26,7 @@ app.use(cors());
 // api key configure
 app.use(validateBearerToken);
 app.use(bodyParser);
+app.use(errorHandler);
 
 //get all bookmarks
 app.get('/bookmarks', (req, res) => {
@@ -38,6 +39,7 @@ app.get('/bookmarks/:id', (req, res) => {
   const bookmark = store.bookmarks.find(c => c.id === id);
   // make sure book is found
   if (!bookmark) {
+
     logger.error(`Book with id ${id} not found.`);
     return res
       .status(404)
@@ -129,6 +131,6 @@ app.get('/', (req, res) => {
 });
 
 
-app.use(errorHandler);
+
 
 module.exports = app;
